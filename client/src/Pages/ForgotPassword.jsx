@@ -1,20 +1,11 @@
 import React, { useState } from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import axios from "axios";
 import Header from "../Components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Define Global Styles
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; /* white */
-    --color-two: #2D2F31; /* black */
-    --color-three: #5022C3; /* bright violet */
-    --color-four: #C0C4FC; /* light violet */
-    --color-five: #F8F9FB; /* light white */
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const Container = styled.div`
   display: flex;
@@ -97,8 +88,8 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = `${server}api/password-reset`;
-      const { data } = await axios.post(url, { email });
+      const url = `/password-reset`;
+      const { data } = await api.post(url, { email });
       toast.success(data.message);
     } catch (error) {
       if (
@@ -131,7 +122,6 @@ function ForgotPassword() {
           <Button type="submit">Submit</Button>
         </Form>
       </Container>
-      <ToastContainer />
     </>
   );
 }

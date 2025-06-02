@@ -1,22 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import axios from "axios";
-import GoogleAuth from "./GoogleAuth";
+import GoogleAuth from "../Components/GoogleAuth";
 import Header from "../Components/Header";
 import useAuth from "../hooks/TokenManagement";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   display: flex;
@@ -152,8 +144,8 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = `${server}api/auth/signup`;
-      const res = await axios.post(url, data);
+      const url = `/auth/signup`;
+      const res = await api.post(url, data);
       toast.success(res.data.message);
     } catch (error) {
       if (
@@ -223,7 +215,6 @@ function SignUp() {
           </SignUpRight>
         </SignUpContainer>
       </DivContainer>
-      <ToastContainer />
     </>
   );
 }

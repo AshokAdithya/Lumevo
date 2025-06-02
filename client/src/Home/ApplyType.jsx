@@ -1,26 +1,18 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Header from "../Components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import useAuth from "../hooks/TokenManagement";
 import axios from "axios";
-import Loading from "./Loading";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import Loading from "../Pages/Loading";
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
-  padding: 40px 60px;
+  padding: 10px 60px;
   background-color: var(--color-one);
   min-height: 100vh;
   display: flex;
@@ -31,7 +23,7 @@ const DivContainer = styled.div`
 const H1 = styled.h1`
   font-size: 24px;
   color: var(--color-two);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: center;
 `;
 
@@ -66,8 +58,7 @@ const UploadSection = styled.div`
   }
 
   input {
-    display: block;
-    margin: 0 auto 10px;
+    display:none;
   }
 
   button {
@@ -95,8 +86,57 @@ const OuterSection = styled.div`
   width: 400px;
 `;
 
+const OuterContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 50px;
+`;
+
+const OuterInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const LabelButton = styled.label`
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 16px !important;
+  border-radius: 20px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  color: var(--color-one) !important;
+  border: 2px solid var(--color-three);
+  background: var(--color-three);
+`;
+
+const FileInput = styled.div`
+  display: flex;
+  width: 200px;
+  height: 40px;
+  border: 2px solid var(--color-four);
+  border-radius: 20px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  overflow: hidden;
+
+  span {
+    flex: 1;
+    text-align: left;
+    font-size: 14px;
+    padding-left: 10px;
+    text-align: center;
+    align-self: center;
+  }
+`;
+
 const UploadedFilesSection = styled.div`
   margin-bottom: 30px;
+
+  input {
+    display: none;
+  }
 
   h1 {
     font-size: 20px;
@@ -131,6 +171,7 @@ const UploadedFilesSection = styled.div`
     }
   }
 `;
+
 function ApplyType() {
   const { loading, user } = useAuth();
   const navigate = useNavigate();
@@ -149,8 +190,7 @@ function ApplyType() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.post(`${server}api/get/get-upload`, {
-        userId: user.id,
+      const response = await api.post(`/get/get-upload`, {
         type: type,
       });
 
@@ -177,8 +217,8 @@ function ApplyType() {
 
   const downloadStudentFile = async (fileId, fileName) => {
     try {
-      const res = await axios.get(
-        `${server}api/downloads/student-file/${fileId}`,
+      const res = await api.get(
+        `/downloads/student-file/${fileId}`,
         {
           responseType: "blob",
         }
@@ -198,7 +238,7 @@ function ApplyType() {
 
   const handleDownload = async () => {
     try {
-      const res = await axios.get(`${server}api/downloads/${type}`, {
+      const res = await api.get(`/downloads/${type}`, {
         responseType: "blob",
       });
       const contentType = res.headers["content-type"];
@@ -219,6 +259,7 @@ function ApplyType() {
   };
 
   const handleTemplateChange = (e) => {
+    console.log(e.target.files[0]);
     setCompletedTemplate(e.target.files[0]);
   };
 
@@ -234,12 +275,12 @@ function ApplyType() {
     const formData = new FormData();
     formData.append("files", completedTemplate);
     formData.append("fileType", "template");
-    formData.append("userId", user.id);
+    // formData.append("userId", user.id);
     formData.append("type", type);
 
     try {
-      const response = await axios.post(
-        `${server}api/uploads/student-upload`,
+      const response = await api.post(
+        `/uploads/student-upload`,
         formData
       );
 
@@ -266,12 +307,12 @@ function ApplyType() {
     const formData = new FormData();
     formData.append("files", additionalFiles);
     formData.append("fileType", "additional");
-    formData.append("userId", user.id);
+    // formData.append("userId", user.id);
     formData.append("type", type);
 
     try {
-      const response = await axios.post(
-        `${server}api/uploads/student-upload`,
+      const response = await api.post(
+        `/uploads/student-upload`,
         formData
       );
       if (response.data.message) {
@@ -290,8 +331,8 @@ function ApplyType() {
 
   const deleteFile = async (fileId) => {
     try {
-      const res = await axios.delete(
-        `${server}api/delete/student-file/${fileId}`
+      const res = await api.delete(
+        `/delete/student-file/${fileId}`
       );
       setLoader(!loader);
       console.log(res.data.message);
@@ -319,85 +360,111 @@ function ApplyType() {
       <DivContainer>
         <H1>{`Apply for ${description}`}</H1>
         <Button onClick={handleDownload}>Download Template</Button>
-        <OuterSection>
-          <UploadSection>
-            <label htmlFor="upload-template">Upload Completed Template:</label>
-            <input
-              type="file"
-              name="files"
-              id="upload-template"
-              onChange={handleTemplateChange}
-            />
-            <button type="button" onClick={uploadTemplate}>
-              Upload Template
-            </button>
-          </UploadSection>
-          {uploadedTemplate && uploadedTemplate.fileId && (
-            <UploadedFilesSection>
-              <h1>Uploaded Template</h1>
-              <ul>
-                <li key={uploadedTemplate.fileId}>
-                  <button
-                    onClick={() =>
-                      downloadStudentFile(
-                        uploadedTemplate.fileId,
-                        uploadedTemplate.fileName
-                      )
-                    }
-                  >
-                    {uploadedTemplate.fileName}
-                  </button>
-                  <button
-                    style={{ color: "red" }}
-                    onClick={() => deleteFile(uploadedTemplate.fileId)}
-                  >
-                    Delete
-                  </button>
-                </li>
-              </ul>
-            </UploadedFilesSection>
-          )}
-        </OuterSection>
-        <OuterSection>
-          <UploadSection>
-            <label htmlFor="upload-documents">
-              Upload Additional Documents:
-            </label>
-            <input
-              type="file"
-              name="files"
-              id="upload-documents"
-              onChange={handleAdditionalFileChange}
-            />
-            <button type="button" onClick={uploadAdditionalFiles}>
-              Upload Files
-            </button>
-          </UploadSection>
-          {uploadedAdditionalFiles.length > 0 && (
-            <UploadedFilesSection>
-              <h1>Uploaded Files</h1>
-              <ul>
-                {uploadedAdditionalFiles.map((file) => (
-                  <li key={file.fileId}>
+        <OuterContainer>
+          <OuterSection>
+            <UploadSection>
+              <label htmlFor="upload-template">
+                Upload Completed Template:
+              </label>
+              <input
+                type="file"
+                name="files"
+                id="upload-template"
+                onChange={handleTemplateChange}
+              />
+              <OuterInput>
+                <FileInput>
+                  <span>
+                    {completedTemplate && completedTemplate.name
+                      ? completedTemplate.name
+                      : "Select Template"}
+                  </span>
+                </FileInput>
+                <LabelButton htmlFor="upload-template">Upload</LabelButton>
+              </OuterInput>
+
+              <button type="button" onClick={uploadTemplate}>
+                Upload Template
+              </button>
+            </UploadSection>
+            {uploadedTemplate && uploadedTemplate.fileId && (
+              <UploadedFilesSection>
+                <h1>Uploaded Template</h1>
+                <ul>
+                  <li key={uploadedTemplate.fileId}>
                     <button
                       onClick={() =>
-                        downloadStudentFile(file.fileId, file.fileName)
+                        downloadStudentFile(
+                          uploadedTemplate.fileId,
+                          uploadedTemplate.fileName
+                        )
                       }
                     >
-                      {file.fileName}
+                      {uploadedTemplate.fileName}
                     </button>
                     <button
                       style={{ color: "red" }}
-                      onClick={() => deleteFile(file.fileId)}
+                      onClick={() => deleteFile(uploadedTemplate.fileId)}
                     >
                       Delete
                     </button>
                   </li>
-                ))}
-              </ul>
-            </UploadedFilesSection>
-          )}
-        </OuterSection>
+                </ul>
+              </UploadedFilesSection>
+            )}
+          </OuterSection>
+          <OuterSection>
+            <UploadSection>
+              <label htmlFor="upload-documents">
+                Upload Additional Documents:
+              </label>
+              <input
+                type="file"
+                name="files"
+                id="upload-documents"
+                onChange={handleAdditionalFileChange}
+              />
+
+              <OuterInput>
+                <FileInput>
+                  <span>
+                    {additionalFiles && additionalFiles.name
+                      ? additionalFiles.name
+                      : "Select File"}
+                  </span>
+                </FileInput>
+                <LabelButton htmlFor="upload-template">Upload</LabelButton>
+              </OuterInput>
+              <button type="button" onClick={uploadAdditionalFiles}>
+                Upload Files
+              </button>
+            </UploadSection>
+            {uploadedAdditionalFiles.length > 0 && (
+              <UploadedFilesSection>
+                <h1>Uploaded Files</h1>
+                <ul>
+                  {uploadedAdditionalFiles.map((file) => (
+                    <li key={file.fileId}>
+                      <button
+                        onClick={() =>
+                          downloadStudentFile(file.fileId, file.fileName)
+                        }
+                      >
+                        {file.fileName}
+                      </button>
+                      <button
+                        style={{ color: "red" }}
+                        onClick={() => deleteFile(file.fileId)}
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </UploadedFilesSection>
+            )}
+          </OuterSection>
+        </OuterContainer>
         {paymentStatus === "pending" && (
           <Button onClick={proceedToPayment}>Proceed to Payment</Button>
         )}

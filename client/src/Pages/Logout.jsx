@@ -3,20 +3,32 @@ import { useDispatch } from "react-redux";
 import { clearUser } from "../redux/UserSlice";
 import { setUnauthenticated } from "../redux/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import { api } from "../utils/useAxiosInstance";
+import { toast } from "react-toastify";
 
 function Logout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(clearUser());
-    dispatch(setUnauthenticated());
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    navigate("/");
+    const logoutFunction = async () => {
+      try {
+        await api.post("/auth/logout");
+        dispatch(clearUser());
+        dispatch(setUnauthenticated());
+        toast.success("Logged out successfully!");
+        navigate("/", { replace: true });
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to logout!");
+        navigate("/", { replace: true });
+      }
+    };
+
+    logoutFunction();
   }, [dispatch, navigate]);
 
-  return <div>Logging out...</div>;
+  return null;
 }
 
 export default Logout;

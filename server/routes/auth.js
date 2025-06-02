@@ -10,25 +10,21 @@ import {
   getExpertRequest,
   adminRejectExpert,
 } from "../controllers/Auth.js";
+import { auth } from "../middleware/Auth.js";
 
 const router = express.Router();
 
 router.post("/signup", signUp);
-
 router.post("/signin", signIn);
-
 router.post("/google", googleAuth);
 
-router.delete("/logout", logout);
-
 router.get("/:id/verify/:token", verify);
-
 router.post("/expert-request", expertRequests);
 
-router.post("/admin/create-expert", adminCreateExpert);
+// Protected routes using new 'auth' middleware
+router.post("/logout", auth, logout);
 
-router.get("/admin/requests", getExpertRequest);
-
-router.post("/admin/reject-request/:email", adminRejectExpert);
-
+router.post("/admin/create-expert", auth, adminCreateExpert);
+router.get("/admin/requests", auth, getExpertRequest);
+router.post("/admin/reject-request/:email", auth, adminRejectExpert);
 export default router;

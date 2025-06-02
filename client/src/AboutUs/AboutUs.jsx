@@ -1,10 +1,10 @@
 import React from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import AboutUsElement from "../Components/AboutUsElement";
+import AboutUsElement from "./AboutUsElement";
 import growBetter from "../assets/grow-better.webp";
 import ourStory from "../assets/our-story.webp";
-import AboutUs2 from "../Components/AboutUs2";
+import AboutUs2 from "./AboutUs2";
 import Image1 from "../assets/Hellow.webp";
 
 function AboutUs() {

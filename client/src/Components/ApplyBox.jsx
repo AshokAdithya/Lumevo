@@ -1,16 +1,7 @@
 // src/Components/ApplyBox.js
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import styled from "styled-components";
+import GlobalStyle from "../utils/Theme";
 const DivContainer = styled.div`
   background: var(--color-five);
   border-radius: 8px;

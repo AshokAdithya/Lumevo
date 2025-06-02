@@ -1,20 +1,10 @@
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import img from "../assets/Graduates.png";
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/TokenManagement";
 import { useDispatch } from "react-redux";
-
-// Define global CSS variables
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
 
 // Styled components using CSS variables
 const Section = styled.section`
@@ -30,7 +20,13 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 5px;
+  }
 `;
 
 const ImageContainer = styled.div`
@@ -38,12 +34,25 @@ const ImageContainer = styled.div`
   top: 50px;
   right: 0px;
   transform: translate(45%, 10%);
+
+  @media (max-width: 768px) {
+    position: relative;
+    transform: none;
+    top: 0;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 `;
 
 const Image = styled.img`
   width: 70%;
   height: 70%;
   z-index: -1;
+
+  // @media (max-width: 768px) {
+  //   width: 90%;
+  // }
 `;
 
 const LeftHoldings = styled.div`
@@ -53,10 +62,19 @@ const LeftHoldings = styled.div`
   justify-content: center;
   align-items: flex-start;
   height: 100%;
+
+  @media (max-width: 768px) {
+    padding: 0 10px;
+    align-items: center;
+    text-align: center;
+  }
 `;
 
 const Descriptions = styled.div`
   width: 65%;
+  @media (max-width: 768px) {
+    width: 80%;
+  }
 `;
 
 const Description1 = styled.h1`
@@ -64,6 +82,10 @@ const Description1 = styled.h1`
   margin-bottom: 20px;
   color: var(--color-two);
   text-transform: uppercase;
+
+  @media (max-width: 768px) {
+    font-size: 25px;
+  }
 `;
 
 const Description2 = styled.h3`
@@ -71,6 +93,10 @@ const Description2 = styled.h3`
   margin-bottom: 40px;
   line-height: 1.6;
   color: var(--color-two);
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 const Description3 = styled.p`
@@ -85,6 +111,12 @@ const ButtonBundle = styled.div`
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    font-size: 14px;
+  }
 `;
 
 const Button = styled(Link)`

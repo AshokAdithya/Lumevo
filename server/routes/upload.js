@@ -16,12 +16,13 @@ import {
   expertUpload,
 } from "../controllers/Upload.js";
 import upload from "../middleware/upload.js";
+import { auth } from "../middleware/Auth.js";
 
 const router = express.Router();
 
-router.post("/upload-template", upload.single("files"), uploadTemplates); //true
+router.post("/upload-template", auth, upload.single("files"), uploadTemplates); //true
 
-router.post("/student-upload", upload.single("files"), studentUpload); //true
+router.post("/student-upload", auth, upload.single("files"), studentUpload); //true
 
 // router.post("/get-upload", getUploads); //false
 
@@ -35,10 +36,11 @@ router.post("/student-upload", upload.single("files"), studentUpload); //true
 
 // router.get("/admin/order", getAdminOrder);
 
-router.post("/expert/upload", upload.single("files"), expertUpload);
+router.post("/expert/upload", auth, upload.single("files"), expertUpload);
 
 router.put(
   "/admin-update/:id",
+  auth,
   upload.single("files"),
   updateUploadedTemplates
 );
@@ -49,7 +51,7 @@ router.put(
 
 // router.get("/get-specific-document/:type", getSpecificDocument);
 
-router.post("/user-file", upload.single("files"), uploadUserFile);
+router.post("/user-file", auth, upload.single("files"), uploadUserFile);
 
 // router.get("/get-user-files/:profileId", getUserFiles);
 

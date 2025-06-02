@@ -1,25 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/UserSlice";
 import { setAuthenticated, setUnauthenticated } from "../redux/AuthSlice";
-import GoogleAuth from "./GoogleAuth";
+import GoogleAuth from "../Components/GoogleAuth";
 import Header from "../Components/Header";
 import useAuth from "../hooks/TokenManagement";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   display: flex;
@@ -76,7 +68,6 @@ const H1 = styled.h1`
   margin-bottom: 30px;
 `;
 
-
 const Form = styled.form`
   display: flex;
   flex-direction: column;
@@ -122,6 +113,7 @@ const Input = styled.input`
     color: var(--color-three);
   }
 `;
+
 function SignIn() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -144,10 +136,8 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = `${server}api/auth/signin`;
-      const res = await axios.post(url, data);
-      localStorage.setItem("accessToken", res.data.access);
-      localStorage.setItem("refreshToken", res.data.refresh);
+      const url = `/auth/signin`;
+      const res = await api.post(url, data);
       dispatch(setAuthenticated());
       dispatch(setUser(res.data.user));
       navigate("/user");
@@ -204,7 +194,6 @@ function SignIn() {
           </SignInRight>
         </SignInContainer>
       </DivContainer>
-      <ToastContainer />
     </>
   );
 }

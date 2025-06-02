@@ -1,27 +1,22 @@
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import Features from "./Features";
+import styled from "styled-components";
+import Features from "../Components/Features";
 import sop from "../assets/sop.png";
 import visa from "../assets/visa.png";
 import lor from "../assets/lor.png";
 import resume from "../assets/resume.png";
 import secret from "../assets/secret.png";
 import expert from "../assets/expert.png";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
 
 const FeaturesContainer = styled.div`
   margin: 30px 20px;
   padding: 0px 60px;
   overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    padding: 0px 20px;
+  }
 `;
 
 const WhyWe = styled.div`
@@ -32,11 +27,12 @@ const WhyWe = styled.div`
   text-align: center;
   max-width: 700px;
   border-radius: 20px;
+  border: 2px solid var(--color-three);
 `;
 
 const WhyWeTitle = styled.h1`
   color: var(--color-two);
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 800;
 
   &::after {
@@ -48,12 +44,20 @@ const WhyWeTitle = styled.h1`
     opacity: 0.5;
     margin: 10px auto;
   }
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const WhyWeDescription = styled.p`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--color-two);
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
 `;
 
 const FeaturesWrapper = styled.div`

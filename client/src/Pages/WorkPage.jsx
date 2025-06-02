@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import useAuth from "../hooks/TokenManagement";
-import ExpertPage from "./ExpertPage";
-import StudentPage from "./StudentPage";
+import ExpertPage from "../DashboardExpert/ExpertPage.jsx";
+import StudentPage from "../DashboardStudent/StudentPage.jsx";
 import AdminPage from "./AdminPage";
 import Loading from "./Loading";
 import { ToastContainer, toast } from "react-toastify";

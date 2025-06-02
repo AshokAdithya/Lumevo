@@ -1,6 +1,8 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import AuthReducer from "./AuthSlice";
 import UserReducer from "./UserSlice";
+import OrderReducer from "./OrderSlice";
+import DataReducer from "./DataSlice";
 
 import {
   persistStore,
@@ -23,6 +25,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: AuthReducer,
   user: UserReducer,
+  orders: OrderReducer,
+  data: DataReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

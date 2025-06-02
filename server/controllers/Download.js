@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { GridFSBucket, ObjectId } from "mongodb";
 import StudentApply from "../models/StudentApply.js";
 import Profile from "../models/Profile.js";
+import { getGfsBucket } from "../utils/gridfs.js";
 
 const conn = mongoose.connection;
 
@@ -30,7 +31,7 @@ export const downloadFiles = async (req, res) => {
       });
     }
 
-    const bucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
+    const bucket = getGfsBucket();
 
     const downloadStream = bucket.openDownloadStream(files.fileId);
     res.set({
@@ -94,7 +95,7 @@ export const downloadStudentFile = async (req, res) => {
       });
     }
 
-    const bucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
+    const bucket = getGfsBucket();
 
     const downloadStream = bucket.openDownloadStream(fileDetails.fileId);
 
@@ -145,7 +146,7 @@ export const downloadUserFile = async (req, res) => {
       });
     }
 
-    const bucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
+    const bucket = getGfsBucket();
 
     const downloadStream = bucket.openDownloadStream(fileDetails.fileId);
 

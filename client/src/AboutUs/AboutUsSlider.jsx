@@ -7,7 +7,7 @@ import styled from "styled-components";
 import Image1 from "../assets/PraveensamSir.jpeg";
 import Image2 from "../assets/DivyajohnMam.jpeg";
 import Image3 from "../assets/VijayabhaskarSir.png";
-import Image4 from "../assets/MarthaMam.jpg";
+// import Image4 from "../assets/MarthaMam.jpg";
 
 const SwiperContainer = styled(Swiper)`
   height: 300px;
@@ -45,15 +45,15 @@ export default function AboutUsSlider() {
     "Praveen Sam",
     "Divya John",
     "Vijaya Bhaskhar Chandran",
-    "Martha Karunakar",
+    // "Martha Karunakar",
   ];
   const description = [
     "Loreum ipsum",
     "Loreum ipsum",
     "Loreum ipsum",
-    "Loreum ipsum",
+    // "Loreum ipsum",
   ];
-  const Images = [Image1, Image2, Image3, Image4];
+  const Images = [Image1, Image2, Image3];
 
   return (
     <SwiperContainer

@@ -2,8 +2,9 @@ import DocumentTypes from "../models/DocumentTypes.js";
 import StudentApply from "../models/StudentApply.js";
 import mongoose from "mongoose";
 import { ObjectId, GridFSBucket } from "mongodb";
-import Mailer from "../utils/Mailer.js";
 import Profile from "../models/Profile.js";
+import { exec, spawn } from "child_process";
+import axios from "axios";
 
 const conn = mongoose.connection;
 let gfsBucket;
@@ -13,7 +14,8 @@ conn.once("open", () => {
 
 export const getUploads = async (req, res) => {
   try {
-    const { userId, type } = req.body;
+    const userId = req.user._id;
+    const { type } = req.body;
 
     const studentFile = await StudentApply.findOne({ userId, type }).sort({
       createdAt: -1,
@@ -43,7 +45,7 @@ export const getUploads = async (req, res) => {
 
 export const getOrders = async (req, res) => {
   try {
-    const userId = req.query.userId;
+    const userId = req.user._id;
 
     const data = await StudentApply.find({
       userId: userId,
@@ -57,8 +59,42 @@ export const getOrders = async (req, res) => {
 
 export const getAllOrders = async (req, res) => {
   try {
-    const all_orders = await StudentApply.find({ paymentStatus: "completed" })
+    const { page, limit, filters } = req.body;
+
+    const filterQuery = {};
+    if (filters.type && filters.type !== "all") {
+      filterQuery.type = filters.type;
+    }
+
+    if (filters.orderStatus && filters.orderStatus !== "all") {
+      filterQuery.status = filters.orderStatus;
+    }
+
+    if (filters.search) {
+      filterQuery.$or = [
+        {
+          "userId.profile.firstName": { $regex: filters.search, $options: "i" },
+        },
+        {
+          "userId.profile.lastName": { $regex: filters.search, $options: "i" },
+        },
+        { "userId.profile.email": { $regex: filters.search, $options: "i" } },
+      ];
+    }
+
+    if (filters.date) {
+      filterQuery.paymentDate = { $gte: new Date(filters.date) };
+    }
+
+    const skip = (page - 1) * limit;
+
+    const all_orders = await StudentApply.find({
+      paymentStatus: "completed",
+      ...filterQuery,
+    })
       .sort({ paymentDate: -1 })
+      .skip(skip)
+      .limit(limit)
       .populate({
         path: "userId",
         populate: {
@@ -66,6 +102,11 @@ export const getAllOrders = async (req, res) => {
           select: "firstName lastName email",
         },
       });
+
+    const totalOrders = await StudentApply.countDocuments({
+      paymentStatus: "completed",
+      ...filterQuery,
+    });
 
     const transformedData = all_orders.map((item) => ({
       _id: item._id,
@@ -84,8 +125,49 @@ export const getAllOrders = async (req, res) => {
       },
     }));
 
-    return res.status(200).send(transformedData);
+    return res.status(200).send({
+      orders: transformedData,
+      total: totalOrders,
+    });
   } catch (err) {
+    console.error(err);
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+export const getSpecificOrdersCount = async (req, res) => {
+  try {
+    const result = await StudentApply.aggregate([
+      {
+        $match: { paymentStatus: "completed" },
+      },
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          type: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    const count = result.reduce((acc, item) => acc + item.count, 0);
+
+    result.push({ type: "All", count });
+
+    const countDict = result.reduce((dict, item) => {
+      dict[item.type] = item.count;
+      return dict;
+    }, {});
+
+    return res.status(200).send(countDict);
+  } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: "Internal Server Error" });
   }
 };
@@ -154,7 +236,7 @@ export const getUpdateUploads = async (req, res) => {
 
 export const getCompletedOrders = async (req, res) => {
   try {
-    const userId = req.query.userId;
+    const userId = req.user._id;
 
     const data = await StudentApply.find({
       userId: userId,
@@ -221,5 +303,33 @@ export const getAllTypes = async (req, res) => {
   } catch (error) {
     console.error("Error fetching document types:", error);
     res.status(500).send({ message: "Error fetching document types" });
+  }
+};
+
+export const getRankings = async (req, res) => {
+  try {
+    const { country_name, course } = req.body;
+    const result = await axios.post("http://localhost:8000/", {
+      country_name: country_name,
+      course: course,
+    });
+
+    res.status(200).send(result.data.list);
+  } catch (err) {
+    res.status(500).send({ message: "Error Fetching data" });
+  }
+};
+
+export const getCCOptions = async (req, res) => {
+  try {
+    const result = await axios.get(
+      "http://localhost:8000/get-countries-courses"
+    );
+    res.status(200).send({
+      countriesList: result.data.countries_list,
+      coursesList: result.data.course_list,
+    });
+  } catch (err) {
+    res.status(500).send({ message: "Error Fetching data" });
   }
 };

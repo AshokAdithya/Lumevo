@@ -1,26 +1,15 @@
 // src/Pages/StudentPage.js
 import React, { useState, useEffect } from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import { useDispatch } from "react-redux";
-import { clearUser } from "../redux/UserSlice";
+import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { setAuthenticated, setUnauthenticated } from "../redux/AuthSlice";
 import Header from "../Components/Header";
 import useAuth from "../hooks/TokenManagement";
 import ApplyBox from "../Components/ApplyBox";
 import orders from "../assets/orders.png";
-import Loading from "./Loading";
+import Loading from "../Pages/Loading";
 import axios from "axios";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   padding: 20px 20px 20px 100px;
@@ -94,8 +83,7 @@ const ApplyContainer = styled.div`
 `;
 
 function StudentPage() {
-  const { loading, user, isAuthenticated } = useAuth();
-  const dispatch = useDispatch();
+  const { loading, user } = useAuth();
   const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
   const server = process.env.REACT_APP_API_SERVER;
@@ -103,7 +91,7 @@ function StudentPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${server}api/uploads/get-documents`);
+        const response = await api.get(`/get/get-documents`, {});
         if (response.data) {
           setDocuments(response.data);
         }
@@ -111,8 +99,9 @@ function StudentPage() {
         console.log(err);
       }
     };
+
     fetchData();
-  }, []);
+  }, [server]);
 
   if (loading) return <Loading />;
 
@@ -128,7 +117,7 @@ function StudentPage() {
         <HeadingContainer>
           <H1>Hi {`${user.profile.firstName} ${user.profile.lastName}`},</H1>
           <Link to="/my-orders">
-            <img src={orders} />
+            <img src={orders} alt="images" />
             MyOrders
           </Link>
         </HeadingContainer>

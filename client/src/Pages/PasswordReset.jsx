@@ -1,29 +1,11 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { useParams } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Define Global Styles
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; /* white */
-    --color-two: #2D2F31; /* black */
-    --color-three: #5022C3; /* bright violet */
-    --color-four: #C0C4FC; /* light violet */
-    --color-five: #F8F9FB; /* light white */
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    width:100vw;
-    font-family: Arial, sans-serif;
-    background-color: var(--color-one);
-    color: var(--color-two);
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const OuterContainer = styled.div`
   display: flex;
@@ -98,7 +80,7 @@ function PasswordReset() {
   const [password, setPassword] = useState("");
   const params = useParams();
   const server = process.env.REACT_APP_API_SERVER;
-  const url = `${server}api/password-reset/${params.id}/${params.token}`;
+  const url = `/password-reset/${params.id}/${params.token}`;
 
   const handleChange = (e) => {
     setPassword(e.target.value);
@@ -107,7 +89,7 @@ function PasswordReset() {
   useEffect(() => {
     const verifyUrl = async () => {
       try {
-        await axios.get(url);
+        await api.get(url);
         setValidUrl(true);
       } catch (error) {
         setValidUrl(false);
@@ -119,7 +101,7 @@ function PasswordReset() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(url, { password });
+      const { data } = await api.post(url, { password });
       toast.success(data.message);
       window.location = "/signin";
     } catch (error) {
@@ -162,7 +144,6 @@ function PasswordReset() {
           </OuterContainer>
         )}
       </Fragment>
-      <ToastContainer />
     </>
   );
 }

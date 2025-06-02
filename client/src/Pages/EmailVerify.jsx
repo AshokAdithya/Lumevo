@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { api } from "../utils/useAxiosInstance";
 
 const MessageContainer = styled.div`
   display: flex;
@@ -39,8 +40,8 @@ function EmailVerify() {
   useEffect(() => {
     const verifyEmailUrl = async () => {
       try {
-        const url = `${server}api/auth/${params.id}/verify/${params.token}`;
-        const res = await axios.get(url);
+        const url = `/auth/${params.id}/verify/${params.token}`;
+        const res = await api.get(url);
         console.log(res.message);
         toast.success("Email verified successfully. You can now sign in.");
         setTimeout(() => {}, 2000);

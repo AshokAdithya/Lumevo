@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Header from "../Components/Header";
 import useAuth from "../hooks/TokenManagement";
 import axios from "axios";
 import Loading from "./Loading";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   padding: 40px 60px;
@@ -144,7 +136,7 @@ function ApplyType() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${server}api/get/get-update-upload`, {
+        const response = await api.get(`/get/get-update-upload`, {
           params: {
             orderId: orderId,
           },
@@ -165,12 +157,9 @@ function ApplyType() {
 
   const downloadStudentFile = async (fileId, fileName) => {
     try {
-      const res = await axios.get(
-        `${server}api/downloads/student-file/${fileId}`,
-        {
-          responseType: "blob",
-        }
-      );
+      const res = await api.get(`/downloads/student-file/${fileId}`, {
+        responseType: "blob",
+      });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
@@ -186,7 +175,7 @@ function ApplyType() {
 
   const handleDownload = async () => {
     try {
-      const res = await axios.get(`${server}api/downloads/${type}`, {
+      const res = await api.get(`/downloads/${type}`, {
         responseType: "blob",
       });
       const contentType = res.headers["content-type"];
@@ -222,14 +211,11 @@ function ApplyType() {
     const formData = new FormData();
     formData.append("files", completedTemplate);
     formData.append("fileType", "template");
-    formData.append("userId", user.id);
+    // formData.append("userId", user.id);
     formData.append("type", type);
 
     try {
-      const response = await axios.post(
-        `${server}api/uploads/student-upload`,
-        formData
-      );
+      const response = await api.post(`/uploads/student-upload`, formData);
       if (response.data.message) {
         setCompletedTemplate(null);
       } else {
@@ -252,14 +238,11 @@ function ApplyType() {
     const formData = new FormData();
     formData.append("files", additionalFiles);
     formData.append("fileType", "additional");
-    formData.append("userId", user.id);
+    // formData.append("userId", user.id);
     formData.append("type", type);
 
     try {
-      const response = await axios.post(
-        `${server}api/uploads/student-upload`,
-        formData
-      );
+      const response = await api.post(`/uploads/student-upload`, formData);
       if (response.data.message) {
         console.log(response.data.message);
         setAdditionalFiles(null);
@@ -275,9 +258,7 @@ function ApplyType() {
 
   const deleteFile = async (fileId) => {
     try {
-      const res = await axios.delete(
-        `${server}api/delete/student-file/${fileId}`
-      );
+      const res = await api.delete(`/delete/student-file/${fileId}`);
       setLoader(!loader);
       console.log(res.data.message);
     } catch (err) {

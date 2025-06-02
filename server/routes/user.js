@@ -4,8 +4,8 @@ import { adminUserCheck, updateProfile } from "../controllers/User.js";
 
 const router = express.Router();
 
-router.get("/:token", auth, adminUserCheck);
+router.get("/access", auth, adminUserCheck);
 
-router.put("/profile/:profileId", updateProfile);
+router.put("/profile/:profileId", auth, updateProfile);
 
 export default router;

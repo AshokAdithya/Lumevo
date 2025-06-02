@@ -1,25 +1,15 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Logo from "./Logo";
 import useAuth from "../hooks/TokenManagement";
 import User from "../assets/user.png";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearUser } from "../redux/UserSlice";
-import { setUnauthenticated } from "../redux/AuthSlice";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import Loading from "../Pages/Loading";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import Insights from "../Pages/Insights";
 
 const Container = styled.header`
   margin: 0;
@@ -32,8 +22,13 @@ const Container = styled.header`
   background-color: var(--color-one);
   box-sizing: border-box;
   position: relative;
-`;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 
+  @media (max-width: 768px) {
+    position: fixed;
+    z-index: 1;
+  }
+`;
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
@@ -170,14 +165,6 @@ const Hr = styled.hr`
   width: 100%;
 `;
 
-const OuterHr = styled.hr`
-  border: none;
-  border-top: 1px solid var(--color-two);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-`;
-
 const FuncOption = styled(Link)`
   padding: 10px 20px;
   transition-duration: 0.6ms;
@@ -192,6 +179,48 @@ const FuncOption = styled(Link)`
   font-weight: 600;
   color: var(--color-four);
   text-decoration: none;
+`;
+
+const Hamburger = styled.div`
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 22px;
+  cursor: pointer;
+  margin-left: auto;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const Bar = styled.div`
+  height: 3px;
+  width: 100%;
+  background-color: var(--color-two);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+`;
+
+const MobileNavLinks =
+  styled.div <
+  { isOpen: Boolean } >
+  `
+  display: none;
+
+  @media (max-width: 768px) {
+    display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+    flex-direction: column;
+    gap: 15px;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-one);
+    padding: 20px;
+    z-index: 1000;
+  }
 `;
 
 function Header() {
@@ -238,6 +267,13 @@ function Header() {
               >
                 Achievements
               </Option> */}
+
+              <Option
+                to="/insights"
+                className={location.pathname === "/insights" ? "active" : ""}
+              >
+                Insights
+              </Option>
               <Option
                 to="/about-us"
                 className={location.pathname === "/about-us" ? "active" : ""}
@@ -251,6 +287,7 @@ function Header() {
                 Contact Us
               </Option>
             </NavLinks>
+
             {isAuthenticated ? (
               <LoggedButtons>
                 <Image src={User} />
@@ -286,7 +323,6 @@ function Header() {
           </Link>
         )}
       </Container>
-      <OuterHr />
     </>
   );
 }

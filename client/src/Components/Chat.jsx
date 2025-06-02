@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import styled, { createGlobalStyle } from "styled-components";
 import useAuth from "../hooks/TokenManagement";
 import axios from "axios";
+import { api } from "../utils/useAxiosInstance";
 
 const server = process.env.REACT_APP_API_SERVER;
 const socket = io(server);
@@ -114,10 +115,9 @@ function Chat({ show, onClose, name, id }) {
   useEffect(() => {
     const getMessages = async () => {
       try {
-        const response = await axios.get(`${server}api/chats/${id}`);
+        const response = await api.get(`/chats/${id}`);
 
         if (response.data) {
-          console.log(response.data.message);
           setMessages(response.data.messages);
         }
       } catch (err) {

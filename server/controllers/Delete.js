@@ -4,12 +4,6 @@ import mongoose from "mongoose";
 import { ObjectId, GridFSBucket } from "mongodb";
 import { getGfsBucket } from "../utils/gridfs.js";
 
-// const conn = mongoose.connection;
-// let gfsBucket;
-// conn.once("open", () => {
-//   gfsBucket = new GridFSBucket(conn.db, { bucketName: "uploads" });
-// });
-
 export const deletePortfolioFile = async (req, res) => {
   const fileId = req.params.fileId;
 

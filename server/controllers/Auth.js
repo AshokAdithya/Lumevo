@@ -128,9 +128,9 @@ export const signIn = async (req, res) => {
           userId: user._id,
           token: crypto.randomBytes(32).toString("hex"),
         }).save();
-        const url = `${process.env.BASE_URL}users/${newUser._id}/verify/${token.token}`;
+        const url = `${process.env.BASE_URL}users/${user._id}/verify/${token.token}`;
 
-        await Mailer(newUser.email, "Verify Email", url);
+        await Mailer(user.email, "Verify Email", url);
       }
       return res
         .status(400)
@@ -140,9 +140,33 @@ export const signIn = async (req, res) => {
 
     const { accessToken, refreshToken } = await GenerateToken(user);
 
+    // res.status(200).send({
+    //   access: accessToken,
+    //   refresh: refreshToken,
+    //   user: {
+    //     id: user._id,
+    //     email: user.email,
+    //     role: user.role,
+    //     profile: userProfile,
+    //   },
+    //   message: "Logged in successfully",
+    // });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 14 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 5 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).send({
-      access: accessToken,
-      refresh: refreshToken,
       user: {
         id: user._id,
         email: user.email,
@@ -183,9 +207,21 @@ export const googleAuth = async (req, res) => {
 
       const { accessToken, refreshToken } = await GenerateToken(existingUser);
 
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 14 * 60 * 1000,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 5 * 24 * 60 * 60 * 1000,
+      });
+
       return res.status(200).send({
-        access: accessToken,
-        refresh: refreshToken,
         user: {
           id: existingUser._id,
           email: existingUser.email,
@@ -228,9 +264,21 @@ export const googleAuth = async (req, res) => {
 
         const { accessToken, refreshToken } = await GenerateToken(newUser);
 
+        res.cookie("accessToken", accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Strict",
+          maxAge: 14 * 60 * 1000,
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Strict",
+          maxAge: 5 * 24 * 60 * 60 * 1000,
+        });
+
         return res.status(200).send({
-          access: accessToken,
-          refresh: refreshToken,
           user: {
             id: newUser._id,
             email: newUser.email,
@@ -278,15 +326,29 @@ export const verify = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    const { error } = validateRefreshTokenScheme(req.body);
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
+    // const { error } = validateRefreshTokenScheme(req.body);
+    // if (error)
+    //   return res.status(400).json({ message: error.details[0].message });
 
-    const userToken = await Token.findOne({ token: req.body.refreshToken });
-    if (!userToken)
-      return res.status(200).json({ message: "Logged Out Sucessfully" });
+    const user_id = req.user._id;
 
-    await userToken.deleteOne();
+    res.cookie("accessToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      expires: new Date(0),
+      path: "/",
+    });
+
+    res.cookie("refreshToken", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      expires: new Date(0),
+      path: "/",
+    });
+
+    await Token.deleteMany({ userId: user_id });
     res.status(200).send({ message: "Logged Out Sucessfully" });
   } catch (err) {
     res.status(500).send({ message: "Internal Server Error" });

@@ -4,23 +4,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/TokenManagement";
 import axios from "axios";
 import Header from "../Components/Header";
-import styled, { createGlobalStyle } from "styled-components";
-import Loading from "./Loading";
+import styled from "styled-components";
+import Loading from "../Pages/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 // Define Global Styles
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; /* white */
-    --color-two: #2D2F31; /* black */
-    --color-three: #5022C3; /* bright violet */
-    --color-four: #C0C4FC; /* light violet */
-    --color-five: #F8F9FB; /* light white */
-  }
-
-`;
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -96,7 +86,7 @@ function Payment() {
     if (applyId) {
       const fetchPaymentDetails = async () => {
         try {
-          const response = await axios.get(`${server}api/payment/get-details`, {
+          const response = await api.get(`/payment/get-details`, {
             params: { applyId },
           });
           if (response.data) {
@@ -104,7 +94,7 @@ function Payment() {
             setDocumentType(response.data.type);
           }
 
-          const status = await axios.get(`${server}api/payment/status`, {
+          const status = await api.get(`/payment/status`, {
             params: { applyId },
           });
 
@@ -166,8 +156,8 @@ function Payment() {
 
   const makePayment = async () => {
     try {
-      const orderUrl = `${server}api/payment/orders/${applyId}`;
-      const { data } = await axios.post(orderUrl, { amount: price });
+      const orderUrl = `/payment/orders/${applyId}`;
+      const { data } = await api.post(orderUrl, { amount: price });
       initPayment(data.data);
     } catch (err) {
       console.log(err);

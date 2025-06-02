@@ -1,19 +1,10 @@
 import React, { useState } from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
-
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 const DivContainer = styled.div`
   position: fixed;
   top: 0;
@@ -101,7 +92,7 @@ function ExpertDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${server}api/auth/expert-request`, data);
+      const res = await api.post(`/auth/expert-request`, data);
       toast.success(res.data.message);
       setData({
         firstName: "",
@@ -180,7 +171,6 @@ function ExpertDetails() {
           </Form>
         </FillForm>
       </DivContainer>
-      <ToastContainer />
     </>
   );
 }

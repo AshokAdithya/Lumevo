@@ -1,23 +1,14 @@
 // src/Pages/UpdateData.js
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Header from "../Components/Header";
 import Loading from "./Loading";
 import useAuth from "../hooks/TokenManagement";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Global style for consistency
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five: #F8F9FB; //light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   padding: 20px 20px 20px 50px;
@@ -132,7 +123,7 @@ function UpdateData() {
   useEffect(() => {
     const fetchDocumentTypes = async () => {
       try {
-        const res = await axios.get(`${server}api/get/get-documents`);
+        const res = await api.get(`/get/get-documents`);
         if (res.data) {
           setDocuments(res.data);
         } else {
@@ -172,7 +163,7 @@ function UpdateData() {
     }
 
     try {
-      await axios.put(`${server}api/uploads/admin-update/${doc._id}`, formData);
+      await api.put(`/uploads/admin-update/${doc._id}`, formData);
       setLoader(!loader);
       toast.success("Document updated successfully");
     } catch (error) {
@@ -183,7 +174,7 @@ function UpdateData() {
 
   const handleDownload = async (type) => {
     try {
-      const res = await axios.get(`${server}api/downloads/${type}`, {
+      const res = await api.get(`/downloads/${type}`, {
         responseType: "blob",
       });
       const contentType = res.headers["content-type"];
@@ -215,7 +206,7 @@ function UpdateData() {
     }
 
     try {
-      await axios.post(`${server}api/uploads/upload-template`, formData);
+      await api.post(`/uploads/upload-template`, formData);
       setLoader(!loader);
       toast.success("Template added successfully");
       setNewTemplate({
@@ -359,7 +350,6 @@ function UpdateData() {
           </FormContainer>
         </DocumentBox>
       </DivContainer>
-      <ToastContainer />
     </>
   );
 }

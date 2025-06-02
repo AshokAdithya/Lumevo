@@ -1,22 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import moment from "moment";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import XIcon from "@mui/icons-material/X";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
-
+import GlobalStyle from "../utils/Theme";
 // Styled components for footer container
 const FooterContainer = styled.footer`
   display: flex;

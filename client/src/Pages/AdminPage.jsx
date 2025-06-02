@@ -1,23 +1,14 @@
 // src/Pages/ExpertRequests.js
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Header from "../Components/Header";
 import Loading from "./Loading";
 import useAuth from "../hooks/TokenManagement";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Global style for consistency
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five: #F8F9FB; //light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const DivContainer = styled.div`
   padding: 20px;
@@ -111,7 +102,7 @@ function ExpertRequests() {
 
   const fetchRequests = async () => {
     try {
-      const res = await axios.get(`${server}api/auth/admin/requests`);
+      const res = await api.get(`/auth/admin/requests`);
       if (res.data.success) {
         setRequests(res.data.data);
       }
@@ -146,7 +137,7 @@ function ExpertRequests() {
 
   const handleApprove = async (req) => {
     try {
-      await axios.post(`${server}api/auth/admin/create-expert`, {
+      await api.post(`/auth/admin/create-expert`, {
         email: req.email,
         firstName: req.firstName,
         lastName: req.lastName,
@@ -163,7 +154,7 @@ function ExpertRequests() {
 
   const handleReject = async (email) => {
     try {
-      await axios.post(`${server}api/auth/admin/reject-request/${email}`);
+      await api.post(`/auth/admin/reject-request/${email}`, {});
       toast.success("Expert request rejected successfully!");
       setTimeout(() => {}, 2000);
       fetchRequests();
@@ -186,7 +177,6 @@ function ExpertRequests() {
           <p>No requests found</p>
         )}
       </DivContainer>
-      <ToastContainer />
     </>
   );
 }

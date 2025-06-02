@@ -4,7 +4,7 @@ import session from "express-session";
 import { Server } from "socket.io";
 import cors from "cors";
 import mongoose from "mongoose";
-import http from "http"; // Import http module
+import http from "http";
 import authRoutes from "./routes/auth.js";
 import passwordResetRoutes from "./routes/passwordReset.js";
 import refreshTokenRoutes from "./routes/refreshToken.js";
@@ -17,24 +17,45 @@ import chatRoute from "./routes/chat.js";
 import Messages from "./models/Messages.js";
 import getRoute from "./routes/get.js";
 import deleteRoute from "./routes/delete.js";
+import csurf from "csurf";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(cookieParser());
+// app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: false, // set true if using HTTPS
+    sameSite: "lax",
+  },
+});
+app.use(csrfProtection);
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+app.use(helmet());
 
 io.on("connection", (socket) => {
   // console.log(`User Connected : ${socket.id}`);
@@ -68,7 +89,18 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("/api/csrf-token", (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
 // Define routes
+app.use((err, req, res, next) => {
+  if (err.code === "EBADCSRFTOKEN") {
+    res.status(403).json({ message: "Invalid CSRF Token" });
+  } else {
+    next(err);
+  }
+});
 app.use("/api/auth", authRoutes);
 app.use("/api/password-reset", passwordResetRoutes);
 app.use("/api/refresh-token", refreshTokenRoutes);

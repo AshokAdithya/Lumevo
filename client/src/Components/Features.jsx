@@ -1,23 +1,21 @@
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
+
+import GlobalStyle from "../utils/Theme";
 
 // Styled components for feature container
 
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
 const FeatureContainer = styled.div`
-  width: 20%;
+  width: 18%;
   background-color: var(--color-five);
   padding: 40px;
   text-align: center;
   border-radius: 20px;
+  border: 2px solid var(--color-three);
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 // Styled components for feature image
@@ -27,14 +25,14 @@ const FeatureImage = styled.img`
 
 // Styled components for feature heading
 const FeatureHeading = styled.h1`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-two);
 `;
 
 // Styled components for feature description
 const FeatureDescription = styled.p`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 300;
   color: var(--color-two);
 `;

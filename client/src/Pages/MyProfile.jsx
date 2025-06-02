@@ -1,21 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState, useCallback } from "react";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import useAuth from "../hooks/TokenManagement";
 import Header from "../Components/Header";
 import Loading from "./Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB;//light white
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const Container = styled.div`
   padding: 20px;
@@ -133,9 +125,7 @@ function MyProfile() {
 
   const getUserFiles = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `${server}api/get/get-user-files/${user.profile._id}`
-      );
+      const response = await api.get(`/get/get-user-files/${user.profile._id}`);
       if (response.data.userFiles) {
         setUserFiles(response.data.userFiles);
       }
@@ -147,7 +137,7 @@ function MyProfile() {
 
   const handleUpdateProfile = async () => {
     try {
-      await axios.put(`${server}api/user/profile/${user.profile._id}`, {
+      await api.put(`/user/profile/${user.profile._id}`, {
         firstName,
         lastName,
       });
@@ -160,8 +150,8 @@ function MyProfile() {
 
   const handleFileDownload = async (fileId, fileName) => {
     try {
-      const response = await axios.get(
-        `${server}api/downloads/user-file/${user.profile._id}/${fileId}`,
+      const response = await api.get(
+        `/downloads/user-file/${user.profile._id}/${fileId}`,
         { responseType: "blob" }
       );
       const contentType = response.headers["content-type"];
@@ -197,10 +187,7 @@ function MyProfile() {
       formData.append("files", uploadFile);
       formData.append("profileId", user.profile._id);
 
-      const response = await axios.post(
-        `${server}api/uploads/user-file`,
-        formData
-      );
+      const response = await api.post(`/uploads/user-file`, formData);
       if (response.data.message) {
         toast.success(response.data.message);
         setUserFiles((userFiles) => [...userFiles, response.data.file]);
@@ -214,7 +201,7 @@ function MyProfile() {
 
   const deleteFile = async (fileId) => {
     try {
-      await axios.delete(`${server}api/delete/portfolio/${fileId}`);
+      await api.delete(`/delete/portfolio/${fileId}`);
       setUserFiles((prevFiles) =>
         prevFiles.filter((file) => file.fileId !== fileId)
       );
@@ -292,7 +279,6 @@ function MyProfile() {
           </ProfileBox>
         </Container>
       )}
-      <ToastContainer />
     </>
   );
 }

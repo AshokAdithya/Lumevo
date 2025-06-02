@@ -5,15 +5,16 @@ import {
   paymentStatus,
   verification,
 } from "../controllers/Payment.js";
+import { auth } from "../middleware/Auth.js";
 
 const router = express.Router();
 
-router.get("/get-details", getDetails);
+router.get("/get-details", auth, getDetails);
 
-router.post("/orders/:applyId", applyOrders);
+router.post("/orders/:applyId", auth, applyOrders);
 
 router.get("/status", paymentStatus);
 
-router.post("/verification", verification);
+router.post("/verification", auth, verification);
 
 export default router;

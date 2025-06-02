@@ -4,13 +4,14 @@ import {
   downloadStudentFile,
   downloadUserFile,
 } from "../controllers/Download.js";
+import { auth } from "../middleware/Auth.js";
 
 const router = express.Router();
 
-router.get("/:type", downloadFiles);
+router.get("/:type", auth, downloadFiles);
 
-router.get("/student-file/:fileId", downloadStudentFile);
+router.get("/student-file/:fileId", auth, downloadStudentFile);
 
-router.get("/user-file/:profileId/:fileId", downloadUserFile);
+router.get("/user-file/:profileId/:fileId", auth, downloadUserFile);
 
 export default router;

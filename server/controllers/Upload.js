@@ -110,7 +110,8 @@ export const updateUploadedTemplates = async (req, res) => {
   }
 };
 export const studentUpload = async (req, res) => {
-  const { userId, type, fileType } = req.body;
+  const userId = req.user._id;
+  const { type, fileType } = req.body;
 
   const file = req.file;
 
@@ -178,7 +179,7 @@ export const studentUpload = async (req, res) => {
 
 export const getUploads = async (req, res) => {
   try {
-    const { userId, type } = req.body;
+    const { type } = req.body;
 
     const studentFile = await StudentApply.findOne({ userId, type }).sort({
       createdAt: -1,

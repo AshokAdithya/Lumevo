@@ -1,31 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import styled, { createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Header from "../Components/Header";
 import Chat from "../Components/Chat";
 import Conversation from "../assets/conversation.png";
 import Loading from "./Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-// Global style for consistency
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --color-one: #FFFFFF; //white
-    --color-two: #2D2F31; //black
-    --color-three: #5022C3; //bright violet
-    --color-four: #C0C4FC; //light violet
-    --color-five:#F8F9FB; //light white
-  }
-
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--color-five);
-  }
-`;
+import GlobalStyle from "../utils/Theme";
+import { api } from "../utils/useAxiosInstance";
 
 const Container = styled.div`
   padding: 20px;
@@ -126,7 +110,7 @@ function TakeAction() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        const response = await axios.get(`${server}api/get/expert/order`, {
+        const response = await api.get(`/get/expert/order`, {
           params: { orderId: orderId },
         });
         setOrderDetails(response.data);
@@ -154,10 +138,7 @@ function TakeAction() {
     formData.append("orderId", orderId);
 
     try {
-      const response = await axios.post(
-        `${server}api/uploads/expert/upload`,
-        formData
-      );
+      const response = await api.post(`/uploads/expert/upload`, formData);
       if (response.data.success) {
         toast.success(response.data.message);
         setSuccessMessage(response.data.success);
@@ -199,7 +180,7 @@ function TakeAction() {
           <Details>
             <p>
               <a
-                href={`${server}api/downloads/student-file/${orderDetails.template.fileId}`}
+                href={`/downloads/student-file/${orderDetails.template.fileId}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -215,7 +196,7 @@ function TakeAction() {
               {orderDetails.additionalFiles.map((file) => (
                 <FileItem key={file.fileId}>
                   <a
-                    href={`${server}api/downloads/student-file/${file.fileId}`}
+                    href={`/downloads/student-file/${file.fileId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -232,7 +213,7 @@ function TakeAction() {
             <Details>
               <p>
                 <a
-                  href={`${server}api/downloads/student-file/${orderDetails.completedFile.fileId}`}
+                  href={`/downloads/student-file/${orderDetails.completedFile.fileId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -270,7 +251,6 @@ function TakeAction() {
           />
         </>
       )}
-      <ToastContainer />
     </>
   );
 }
