@@ -152,18 +152,32 @@ export const signIn = async (req, res) => {
     //   message: "Logged in successfully",
     // });
 
+    // res.cookie("accessToken", accessToken, {
+    //   httpOnly: true,
+    //   secure: true, //process.env.NODE_ENV === "production",
+    //   sameSite: "Strict",
+    //   maxAge: 14 * 60 * 1000,
+    // });
+
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "Strict",
+    //   maxAge: 5 * 24 * 60 * 60 * 1000,
+    // });
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true, // ✅ Must be true on HTTPS (Render)
+      sameSite: "None", // ✅ Needed for cross-origin cookies
       maxAge: 14 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // example: 7 days
     });
 
     res.status(200).send({
@@ -209,16 +223,16 @@ export const googleAuth = async (req, res) => {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
+        secure: true, // ✅ Must be true on HTTPS (Render)
+        sameSite: "None", // ✅ Needed for cross-origin cookies
         maxAge: 14 * 60 * 1000,
       });
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 5 * 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: "None",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // example: 7 days
       });
 
       return res.status(200).send({
@@ -266,16 +280,16 @@ export const googleAuth = async (req, res) => {
 
         res.cookie("accessToken", accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "Strict",
+          secure: true, // ✅ Must be true on HTTPS (Render)
+          sameSite: "None", // ✅ Needed for cross-origin cookies
           maxAge: 14 * 60 * 1000,
         });
 
         res.cookie("refreshToken", refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "Strict",
-          maxAge: 5 * 24 * 60 * 60 * 1000,
+          secure: true,
+          sameSite: "None",
+          maxAge: 7 * 24 * 60 * 60 * 1000, // example: 7 days
         });
 
         return res.status(200).send({
@@ -332,20 +346,18 @@ export const logout = async (req, res) => {
 
     const user_id = req.user._id;
 
-    res.cookie("accessToken", "", {
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      expires: new Date(0),
-      path: "/",
+      secure: true, // ✅ Must be true on HTTPS (Render)
+      sameSite: "None", // ✅ Needed for cross-origin cookies
+      maxAge: 14 * 60 * 1000,
     });
 
-    res.cookie("refreshToken", "", {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      expires: new Date(0),
-      path: "/",
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // example: 7 days
     });
 
     await Token.deleteMany({ userId: user_id });

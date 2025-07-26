@@ -21,8 +21,8 @@ export const newAccessToken = async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true, // process.env.NODE_ENV === "production",
+      sameSite: "None", //"Strict",
       maxAge: 14 * 60 * 1000,
     });
 
