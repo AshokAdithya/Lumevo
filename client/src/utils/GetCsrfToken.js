@@ -6,7 +6,7 @@ export const fetchCsrfToken = async () => {
   if (csrfToken) return csrfToken;
 
   const response = await axios.get(
-    `${process.env.REACT_APP_API_SERVER}api/csrf-token`,
+    `${process.env.REACT_APP_API_SERVER}/api/csrf-token`,
     {
       withCredentials: true,
     }
