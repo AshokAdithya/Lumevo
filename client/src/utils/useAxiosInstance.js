@@ -1,7 +1,7 @@
 import axios from "axios";
 import { fetchCsrfToken } from "./GetCsrfToken";
 
-const server = "http://localhost:8080/api";
+const server = `${process.env.REACT_APP_API_SERVER}api`;
 
 export const api = axios.create({
   baseURL: server,

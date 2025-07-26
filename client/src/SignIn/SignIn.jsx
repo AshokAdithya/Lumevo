@@ -199,16 +199,3 @@ function SignIn() {
 }
 
 export default SignIn;
-
-const SocialSignUpOptions = [
-  {
-    id: 1,
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/fe25702b65b129e3e683d1a34a7c75018db2bf42110c67ce80951dd6ddd37741?apiKey=57ccf907906c4012b1a75d0dde5c8ad7&",
-    text: "Sign up with Google",
-  },
-  {
-    id: 2,
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/7ab9e8aaf8155aaecddc0e66ffe572ccfd0433c7c78938648b2670e8c209ac6d?apiKey=57ccf907906c4012b1a75d0dde5c8ad7&",
-    text: "Sign up with LinkedIn",
-  },
-];
