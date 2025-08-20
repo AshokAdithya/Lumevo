@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Loading from "./Pages/Loading";
 import RequireAuth from "./utils/RequireAuth";
 import { ToastContainer } from "react-toastify";
+
 const Home = lazy(() => import("./Home/Home"));
 const AboutUs = lazy(() => import("./AboutUs/AboutUs"));
 const Achievements = lazy(() => import("./Pages/Achievements"));
@@ -30,30 +31,29 @@ function App() {
       <div className="App">
         <Suspense fallback={<Loading />}>
           <Routes>
-            <Route path="/" exact element={<Home />} />
-            <Route path="/about-us" exact element={<AboutUs />} />
-            <Route path="/achievements" exact element={<Achievements />} />
-            <Route path="/contact-us" exact element={<ContactUs />} />
-            <Route path="/signup" exact element={<SignUp />} />
-            <Route path="/signin" exact element={<SignIn />} />
-            <Route
-              path="/users/:id/verify/:token"
-              exact
-              element={<EmailVerify />}
-            />
+            {/* Public Routes */}
+            <Route index element={<Home />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/achievements" element={<Achievements />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+            <Route path="/password-reset" element={<ForgotPassword />} />
+            <Route path="/insights" element={<Insights />} />
+            <Route path="/logout" element={<Logout />} />
+
+            {/* Protected Routes */}
             <Route
               path="/expert-details"
-              exact
               element={
                 <RequireAuth>
                   <ExpertDetails />
                 </RequireAuth>
               }
             />
-            <Route path="/password-reset" exact element={<ForgotPassword />} />
             <Route
               path="/password-reset/:id/:token"
-              exact
               element={
                 <RequireAuth>
                   <PasswordReset />
@@ -62,20 +62,14 @@ function App() {
             />
             <Route
               path="/user"
-              exact
               element={
                 <RequireAuth>
                   <WorkPage />
                 </RequireAuth>
               }
             />
-            <Route path="logout" exact element={<Logout />} />
-            <Route path="insights" exact element={<Insights />} />
-
-            {/* Student */}
             <Route
               path="/my-orders"
-              exact
               element={
                 <RequireAuth>
                   <MyOrders />
@@ -84,7 +78,6 @@ function App() {
             />
             <Route
               path="/payment"
-              exact
               element={
                 <RequireAuth>
                   <Payment />
@@ -93,7 +86,6 @@ function App() {
             />
             <Route
               path="/apply/:type"
-              exact
               element={
                 <RequireAuth>
                   <ApplyType />
@@ -102,7 +94,6 @@ function App() {
             />
             <Route
               path="/update-files"
-              exact
               element={
                 <RequireAuth>
                   <UpdateFile />
@@ -111,29 +102,22 @@ function App() {
             />
             <Route
               path="/my-profile"
-              exact
               element={
                 <RequireAuth>
                   <MyProfile />
                 </RequireAuth>
               }
             />
-
-            {/* Expert */}
             <Route
               path="/take-action"
-              exact
               element={
                 <RequireAuth>
                   <TakeAction />
                 </RequireAuth>
               }
             />
-
-            {/* Admin */}
             <Route
               path="/update-data"
-              exact
               element={
                 <RequireAuth>
                   <UpdateData />
@@ -141,6 +125,7 @@ function App() {
               }
             />
           </Routes>
+
           <ToastContainer
             position="top-right"
             autoClose={3000}

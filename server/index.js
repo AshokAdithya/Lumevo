@@ -32,10 +32,11 @@ app.use(cookieParser());
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
-    secure: true, // set true if using HTTPS //false for development
-    sameSite: "None",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   },
 });
+
 app.use(csrfProtection);
 
 const server = http.createServer(app);

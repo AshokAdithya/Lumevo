@@ -5,7 +5,7 @@ const server = `${process.env.REACT_APP_API_SERVER}/api`;
 
 export const api = axios.create({
   baseURL: server,
-  withCredentials: true, // needed to send cookies
+  withCredentials: true,
 });
 
 api.interceptors.request.use(async (config) => {
