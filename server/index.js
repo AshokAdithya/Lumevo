@@ -25,10 +25,25 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+// --- Middleware order matters ---
 app.use(cookieParser());
-// app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 
+// ✅ CORS first
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, // https://lumevo-rho.vercel.app
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
+
+// ✅ Helmet after CORS (otherwise may block)
+app.use(helmet());
+
+// ✅ JSON parser
+app.use(express.json());
+
+// ✅ CSRF after CORS + cookieParser
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
@@ -36,72 +51,21 @@ const csrfProtection = csurf({
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   },
 });
-
 app.use(csrfProtection);
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-app.use(helmet());
-
-io.on("connection", (socket) => {
-  // console.log(`User Connected : ${socket.id}`);
-
-  socket.on("disconnect", () => {
-    // console.log(`User Disconnected: ${socket.id}`);
-  });
-
-  socket.on("join_room", (roomId) => {
-    socket.join(roomId);
-    // console.log(`User ${socket.id} joined room: ${roomId}`);
-  });
-
-  socket.on("send_message", async (data) => {
-    const { roomId, userId, message } = data;
-
-    if (!roomId || !userId || !message) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-    try {
-      const chat = await Messages({
-        roomId: roomId,
-        userId: userId,
-        message: message,
-      }).save();
-
-      socket.to(roomId).emit("receive_message", { roomId, userId, message });
-    } catch (err) {
-      console.error("Error saving message:", err);
-    }
-  });
-});
-
+// --- Routes ---
 app.get("/api/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// Define routes
+// Handle CSRF errors
 app.use((err, req, res, next) => {
   if (err.code === "EBADCSRFTOKEN") {
-    res.status(403).json({ message: "Invalid CSRF Token" });
-  } else {
-    next(err);
+    return res.status(403).json({ message: "Invalid CSRF Token" });
   }
+  next(err);
 });
+
 app.use("/api/auth", authRoutes);
 app.use("/api/password-reset", passwordResetRoutes);
 app.use("/api/refresh-token", refreshTokenRoutes);
@@ -113,26 +77,43 @@ app.use("/api/chats", chatRoute);
 app.use("/api/get", getRoute);
 app.use("/api/delete", deleteRoute);
 
-// Connect to MongoDB
+// --- Socket.IO ---
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.on("disconnect", () => {});
+  socket.on("join_room", (roomId) => {
+    socket.join(roomId);
+  });
+  socket.on("send_message", async (data) => {
+    const { roomId, userId, message } = data;
+    if (!roomId || !userId || !message) return;
+    try {
+      await Messages({ roomId, userId, message }).save();
+      socket.to(roomId).emit("receive_message", { roomId, userId, message });
+    } catch (err) {
+      console.error("Error saving message:", err);
+    }
+  });
+});
+
+// --- MongoDB ---
 const connect = async () => {
   mongoose.connect(process.env.MONGO);
-
-  mongoose.connection.on("connected", () => {
-    console.log("Databse connected successfully");
-  });
-
-  mongoose.connection.on("error", (error) => {
-    console.log("error while connecting to database : " + error);
-  });
-
-  mongoose.connection.on("disconnected", () => {
-    console.log("Database Disconnected");
-  });
+  mongoose.connection.on("connected", () => console.log("Database connected"));
+  mongoose.connection.on("error", (error) => console.log("DB Error:", error));
+  mongoose.connection.on("disconnected", () => console.log("DB Disconnected"));
 };
 
 const conn = mongoose.connection;
 let gfs;
-
 conn.once("open", () => {
   gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection("uploads");
@@ -141,7 +122,7 @@ conn.once("open", () => {
 
 server.listen(process.env.PORT, () => {
   connect();
-  console.log(`Server Started on port ${process.env.port}`);
+  console.log(`Server Started on port ${process.env.PORT}`);
 });
 
 // import dotenv from "dotenv";
