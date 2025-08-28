@@ -133,7 +133,7 @@ function Payment() {
     }
 
     const options = {
-      key: process.env.RAZORPAY_KEY,
+      key: process.env.REACT_APP_RAZORPAY_KEY,
       amount: data.amount,
       currency: data.currency,
       name: documentType,
