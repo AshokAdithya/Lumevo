@@ -346,7 +346,7 @@ export const logout = async (req, res) => {
 
     const user_id = req.user._id;
 
-    res.cookie("accessToken", accessToken, {
+    res.cookie("accessToken", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
@@ -354,7 +354,7 @@ export const logout = async (req, res) => {
       path: "/",
     });
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
